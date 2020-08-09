@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -15,88 +16,55 @@ namespace TwitchHostRoulette
     class Program
     {
         private static IrcClient _ircClient;
+        private static ConcurrentDictionary<string, string> _usersJoined;
+
+        private static RouletteStateEnum _rouletteState = RouletteStateEnum.WaitingToStart;
+
         static void Main(string[] args)
         {
             var username = ConfigurationManager.AppSettings["username"];
             var userId = int.Parse(ConfigurationManager.AppSettings["user-id"]);
             string oauthToken = ConfigurationManager.AppSettings["api-oauth-token"];
             string clientId = ConfigurationManager.AppSettings["api-client-id"];
+            string password = ConfigurationManager.AppSettings["oauth"];
+
+            _usersJoined = new ConcurrentDictionary<string, string>();
+
+            _startIrc(username, password);
+
+            //give IRC time to connect
+            Thread.Sleep(500);
 
             TwitchApiClient twitchApiClient = new TwitchApiClient();
 
             Random random = new Random();
 
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("Press Q to quit.");
-            do
+            while (_rouletteState != RouletteStateEnum.Quitting)
             {
-                ChattersModel chattersData = twitchApiClient.GetChatters(username).Result;
-
-                List<FollowDataModel> followersData = _getFollowers(
-                    twitchApiClient: twitchApiClient,
-                    userId: userId,
-                    oauthToken: oauthToken,
-                    clientId: clientId
-                    );
-
-                string[] chatters = chattersData.Chatters.VIPs
-                    .Concat(chattersData.Chatters.Moderators)
-                    .Concat(chattersData.Chatters.Staff)
-                    .Concat(chattersData.Chatters.Admins)
-                    .Concat(chattersData.Chatters.GlobalMods)
-                    .Concat(chattersData.Chatters.Viewers)
-                    .Select(c => c.ToLower())
-                    .ToArray();
-
-                string[] followers = followersData.Select(f => f.FromName.ToLower()).ToArray();
-
-
-                List<string> followersInChat = chatters.Intersect(followers).Distinct().ToList();
-
-                if(followersInChat.Count == 0)
+                switch (_rouletteState)
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("There are no followers in chat!");
-                    continue;
+                    case RouletteStateEnum.WaitingToStart:
+                        _handleWaitingToStart();
+                        break;
+                    case RouletteStateEnum.WaitingForJoins:
+                        _handleWaitingForJoins();
+                        break;
+                    case RouletteStateEnum.PickingAWinner:
+                        _handlePickingAWinner(
+                            twitchApiClient: twitchApiClient,
+                            username: username,
+                            userId: userId,
+                            oauthToken: oauthToken,
+                            clientId: clientId,
+                            random: random
+                            );
+                        break;
                 }
+            } 
+        }
 
-                bool isHostChosen = false;
-                while (!isHostChosen)
-                {
-                    int index = random.Next(followersInChat.Count);
-
-                    string chosenFollower = followersInChat[index];
-
-                    List<StreamData> streamDataList = twitchApiClient.GetStreams(1, (s) => true, chosenFollower, "512710").Result; //CoD ID
-
-                    if (streamDataList.Count > 0)
-                    {
-                        isHostChosen = true;
-
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine(chosenFollower);
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"{chosenFollower} was chosen, but is not streaming the game.");
-                        //remove because they're not streaming
-                        followersInChat.Remove(chosenFollower);
-
-                        if(followersInChat.Count == 0)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine("Could not find a follower in chat that is streaming the game!");
-                            break;
-                        }
-                    }
-                }
-            } while (Console.ReadKey(true).Key != ConsoleKey.Q);
-
-
-            /*
-            string password = ConfigurationManager.AppSettings["oauth"];
-
+        private static void _startIrc(string username, string password)
+        {
             _ircClient = new IrcClient("irc.chat.twitch.tv", 6667, username, password); //password from www.twitchapps.com/tmi
 
             Thread ircThread = new Thread(_handleIrc);
@@ -104,15 +72,124 @@ namespace TwitchHostRoulette
             ircThread.Start();
 
             _ircClient.JoinRoom(username);
-            _ircClient.RequestNames(username);
+        }
 
-            var apiClient = new TwitchApiClient();
+        private static void _handleWaitingToStart()
+        {
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine("Waiting to start.");
+            Console.WriteLine("Press S to start or Q to quit.");
+            Console.WriteLine();
+            ConsoleKeyInfo key = Console.ReadKey(true);
 
-            while(true)
+            switch (key.Key)
             {
-                Thread.Sleep(500);
+                case ConsoleKey.S:
+                    _usersJoined.Clear();
+                    _rouletteState = RouletteStateEnum.WaitingForJoins;
+                    break;
+                case ConsoleKey.Q:
+                    _rouletteState = RouletteStateEnum.Quitting;
+                    break;
             }
-            */
+        }
+
+        private static void _handleWaitingForJoins()
+        {
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine("Waiting for joins.");
+            Console.WriteLine("Press C to continue, B to go back, or Q to quit.");
+            Console.WriteLine();
+            ConsoleKeyInfo key = Console.ReadKey(true);
+
+            switch (key.Key)
+            {
+                case ConsoleKey.C:
+                    _rouletteState = RouletteStateEnum.PickingAWinner;
+                    break;
+                case ConsoleKey.B:
+                    _rouletteState = RouletteStateEnum.WaitingToStart;
+                    break;
+                case ConsoleKey.Q:
+                    _rouletteState = RouletteStateEnum.Quitting;
+                    break;
+            }
+        }
+
+        private static void _handlePickingAWinner(TwitchApiClient twitchApiClient, string username, int userId, string oauthToken, string clientId, Random random)
+        {
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine("Picking a winner.");
+            Console.WriteLine();
+
+            //ChattersModel chattersData = twitchApiClient.GetChatters(username).Result;
+
+            //string[] chatters = chattersData.Chatters.VIPs
+            //    .Concat(chattersData.Chatters.Moderators)
+            //    .Concat(chattersData.Chatters.Staff)
+            //    .Concat(chattersData.Chatters.Admins)
+            //    .Concat(chattersData.Chatters.GlobalMods)
+            //    .Concat(chattersData.Chatters.Viewers)
+            //    .Select(c => c.ToLower())
+            //    .ToArray();
+
+            //List<FollowDataModel> followersData = _getFollowers(
+            //    twitchApiClient: twitchApiClient,
+            //    userId: userId,
+            //    oauthToken: oauthToken,
+            //    clientId: clientId
+            //    );
+
+            //string[] followers = followersData.Select(f => f.FromName.ToLower()).ToArray();
+
+
+            //List<string> participants = chatters.Intersect(followers).Distinct().ToList();
+
+            List<string> participants = _usersJoined.Keys.Distinct().ToList();
+
+            if (participants.Count == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("No one has joined!");
+
+                _rouletteState = RouletteStateEnum.WaitingToStart;
+                return;
+            }
+
+            bool isHostChosen = false;
+            while (!isHostChosen)
+            {
+                int index = random.Next(participants.Count);
+
+                string chosenParticipant = participants[index];
+
+                List<StreamData> streamDataList = twitchApiClient.GetStreams(1, (s) => true, chosenParticipant, "512710").Result; //CoD ID
+
+                if (streamDataList.Count > 0)
+                {
+                    isHostChosen = true;
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(chosenParticipant);
+                    _rouletteState = RouletteStateEnum.WaitingToStart;
+                    return;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"{chosenParticipant} was chosen, but is not streaming the game.");
+                    //remove because they're not streaming
+                    participants.Remove(chosenParticipant);
+
+                    if (participants.Count == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Could not find a follower in chat that is streaming the game.");
+                        _rouletteState = RouletteStateEnum.WaitingToStart;
+                        return;
+                    }
+                }
+            }
         }
 
         private static List<FollowDataModel> _getFollowers(TwitchApiClient twitchApiClient, int userId, string oauthToken, string clientId)
@@ -163,7 +240,12 @@ namespace TwitchHostRoulette
                         _updateChatDisplay(message);
                         break;
                     case MessageTypeEnum.PrivateMessage:
-                        _updateChatDisplay(message);
+                        if(_rouletteState == RouletteStateEnum.WaitingForJoins && message.Text.ToLower().StartsWith("!join"))
+                        {
+                            var usernameLower = message.Username.ToLower();
+                            _usersJoined.TryAdd(usernameLower, usernameLower);
+                        }
+                        //_updateChatDisplay(message);
                         break;
                     case MessageTypeEnum.Ping:
                         _ircClient.SendIrcMessage("PONG");
@@ -174,6 +256,7 @@ namespace TwitchHostRoulette
 
         private static void _updateChatDisplay(Message message)
         {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
             if (message.Username != null)
             {
 
