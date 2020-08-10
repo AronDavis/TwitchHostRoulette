@@ -133,24 +133,23 @@ namespace TwitchHostRoulette
             //    .Select(c => c.ToLower())
             //    .ToArray();
 
-            //List<FollowDataModel> followersData = _getFollowers(
-            //    twitchApiClient: twitchApiClient,
-            //    userId: userId,
-            //    oauthToken: oauthToken,
-            //    clientId: clientId
-            //    );
+            List<FollowDataModel> followersData = _getFollowers(
+                twitchApiClient: twitchApiClient,
+                userId: userId,
+                oauthToken: oauthToken,
+                clientId: clientId
+                );
 
-            //string[] followers = followersData.Select(f => f.FromName.ToLower()).ToArray();
+            string[] followers = followersData.Select(f => f.FromName.ToLower()).ToArray();
 
+            var usersJoined = _usersJoined.Keys.Distinct();
 
-            //List<string> participants = chatters.Intersect(followers).Distinct().ToList();
-
-            List<string> participants = _usersJoined.Keys.Distinct().ToList();
+            List<string> participants = usersJoined.Intersect(followers).ToList();
 
             if (participants.Count == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("No one has joined!");
+                Console.WriteLine("No followers have joined!");
 
                 _rouletteState = RouletteStateEnum.WaitingToStart;
                 return;
@@ -184,7 +183,7 @@ namespace TwitchHostRoulette
                     if (participants.Count == 0)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Could not find a follower in chat that is streaming the game.");
+                        Console.WriteLine("Could not find a follower that has joined and is streaming the game.");
                         _rouletteState = RouletteStateEnum.WaitingToStart;
                         return;
                     }
