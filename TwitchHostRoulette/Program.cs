@@ -2,11 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using TwitchApi;
-using TwitchApi.ResponseModels.Chatters;
 using TwitchApi.ResponseModels.Streams;
 using TwitchHostRoulette.Models.Follows;
 using TwitchIrcBot;

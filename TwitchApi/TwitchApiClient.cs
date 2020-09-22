@@ -68,15 +68,11 @@ namespace TwitchApi
             {
                 current = await _getMoreData(current?.Pagination.Cursor, userLogin, gameId);
 
-                //if we couldn't find as many as we hoped to find, bail out of the loop
-                if (current.Pagination.Cursor == null)
-                    break;
-
                 foreach (var d in current.Data)
                 {
                     if (!streamIds.Contains(d.Id) && d.GameId != string.Empty)
                     {
-                        if (filter == null || !filter(d))
+                        if (filter != null && !filter(d))
                             continue;
 
                         streamData.Add(d);
@@ -86,6 +82,10 @@ namespace TwitchApi
                             break;
                     }
                 }
+
+                //if we couldn't find as many as we hoped to find, bail out of the loop
+                if (current.Pagination.Cursor == null)
+                    break;
             }
 
             return streamData;
