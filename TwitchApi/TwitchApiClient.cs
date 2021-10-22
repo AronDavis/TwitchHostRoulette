@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using TwitchApi.ResponseModels.Chatters;
 using TwitchApi.ResponseModels.Streams;
+using TwitchApi.ResponseModels.Users;
 using TwitchHostRoulette.Models.Follows;
 
 namespace TwitchApi
@@ -14,6 +15,23 @@ namespace TwitchApi
     public class TwitchApiClient
     {
         private HttpClient _client = new HttpClient();
+
+        public async Task<int> GetUserId(string username, string oauthToken, string clientId)
+        {
+            string url = "https://api.twitch.tv/helix/users";
+
+            url = QueryHelpers.AddQueryString(url, "login", username);
+
+            HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Get, url);
+            message.Headers.Add("Authorization", $"Bearer { oauthToken }");
+            message.Headers.Add("client-id", clientId);
+
+            HttpResponseMessage results = await _client.SendAsync(message);
+            string jsonString = await results.Content.ReadAsStringAsync();
+            UsersModel data = JsonConvert.DeserializeObject<UsersModel>(jsonString);
+
+            return data.Data[0].Id;
+        }
 
         public async Task<ChattersModel> GetChatters(string user)
         {
@@ -33,6 +51,32 @@ namespace TwitchApi
             url = QueryHelpers.AddQueryString(url, "first", 100.ToString()); //returns 100 followers in the data object
 
             url = QueryHelpers.AddQueryString(url, "to_id", toId.ToString());
+
+            if (cursor != null)
+                url = QueryHelpers.AddQueryString(url, "after", cursor);
+
+            HttpResponseMessage response = await _client.SendAsync(new HttpRequestMessage()
+            {
+                RequestUri = new Uri(url),
+                Method = HttpMethod.Get,
+                Headers = {
+                    { "Authorization", $"Bearer {oauthToken}" },
+                    { "client-id", clientId },
+                },
+            });
+            string jsonString = await response.Content.ReadAsStringAsync();
+            FollowsModel data = JsonConvert.DeserializeObject<FollowsModel>(jsonString);
+
+            return data;
+        }
+
+        public async Task<FollowsModel> GetPeopleUserFollows(int fromId, string oauthToken, string clientId, string cursor = null)
+        {
+            var url = "https://api.twitch.tv/helix/users/follows";
+
+            url = QueryHelpers.AddQueryString(url, "first", 100.ToString()); //returns 100 followers in the data object
+
+            url = QueryHelpers.AddQueryString(url, "from_id", fromId.ToString());
 
             if (cursor != null)
                 url = QueryHelpers.AddQueryString(url, "after", cursor);

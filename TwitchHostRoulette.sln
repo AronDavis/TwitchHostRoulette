@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30309.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchHostRoulette", "TwitchHostRoulette\TwitchHostRoulette.csproj", "{F0EE5F43-9424-4735-889F-80A8427209FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchHostRoulette", "TwitchHostRoulette\TwitchHostRoulette.csproj", "{F0EE5F43-9424-4735-889F-80A8427209FD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchApi", "TwitchApi\TwitchApi.csproj", "{AF0D5E47-55AB-4E98-98CE-54F88EF26239}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchIrcBot", "TwitchIrcBot\TwitchIrcBot.csproj", "{7CCFBF57-35DB-4AFF-B986-5EAD239D89F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FollowCheck", "FollowCheck\FollowCheck.csproj", "{ADA35907-0B30-490D-B082-03D400D68B85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{7CCFBF57-35DB-4AFF-B986-5EAD239D89F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CCFBF57-35DB-4AFF-B986-5EAD239D89F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CCFBF57-35DB-4AFF-B986-5EAD239D89F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADA35907-0B30-490D-B082-03D400D68B85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADA35907-0B30-490D-B082-03D400D68B85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADA35907-0B30-490D-B082-03D400D68B85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADA35907-0B30-490D-B082-03D400D68B85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
