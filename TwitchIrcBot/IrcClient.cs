@@ -21,7 +21,7 @@ namespace TwitchIrcBot
 
         public IrcClient(string ip, int port, string username, string password)
         {
-            this._username = username;
+            _username = username;
             _tcpClient = new TcpClient(ip, port);
             _inputStream = new StreamReader(_tcpClient.GetStream());
             _outputStream = new StreamWriter(_tcpClient.GetStream());

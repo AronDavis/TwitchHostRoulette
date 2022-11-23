@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Net.Http;
 using System.Threading.Tasks;
+using TwitchApi.ResponseModels.Auth;
 using TwitchApi.ResponseModels.Chatters;
 using TwitchApi.ResponseModels.Streams;
 using TwitchApi.ResponseModels.Users;
@@ -15,6 +16,26 @@ namespace TwitchApi
     public class TwitchApiClient
     {
         private HttpClient _client = new HttpClient();
+
+        public async Task<UserAccessTokenModel> GetUserAccessToken(string clientId, string clientSecret, string authorizationCode, string redirectUri)
+        {
+
+            string url = "https://id.twitch.tv/oauth2/token";
+
+            url = QueryHelpers.AddQueryString(url, "client_id", clientId);
+            url = QueryHelpers.AddQueryString(url, "client_secret", clientSecret);
+            url = QueryHelpers.AddQueryString(url, "code", authorizationCode);
+            url = QueryHelpers.AddQueryString(url, "grant_type", "authorization_code");
+            url = QueryHelpers.AddQueryString(url, "redirect_uri", redirectUri);
+
+            HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, url);
+
+            HttpResponseMessage results = await _client.SendAsync(message);
+            string jsonString = await results.Content.ReadAsStringAsync();
+            UserAccessTokenModel data = JsonConvert.DeserializeObject<UserAccessTokenModel>(jsonString);
+
+            return data;
+        }
 
         public async Task<int> GetUserId(string username, string oauthToken, string clientId)
         {

@@ -12,8 +12,15 @@ namespace FollowCheck
         {
             string username = "VOXindie";
             //to get oauth:
-            //https://id.twitch.tv/oauth2/token?client_id=p4y1qamoqkv2o2gm8fnw642yhfdec8&client_secret=my0oh15famxbcg6y9dtdr6b9140r0v&grant_type=client_credentials
-            string oauthToken = "i3kegkcw7zygtx45e1qlzbpnx3ghvx";
+            //cli: twitch configuration (get info here: https://dev.twitch.tv/console/apps/p4y1qamoqkv2o2gm8fnw642yhfdec8)
+            //1. cmd
+            //2. twitch configure
+            //3. set Client Id and Client Secret
+            //4. twitch token
+            //5. copy token
+            //
+            //ALTERNATIVELY JUST twitch token
+            string oauthToken = "vhv4ihwtf1bljqca65yv8j0qnd645i";
             string clientId = "p4y1qamoqkv2o2gm8fnw642yhfdec8";
 
             TwitchApiClient twitchApiClient = new TwitchApiClient();
@@ -79,7 +86,5 @@ namespace FollowCheck
 
             return followersData;
         }
-
-        
     }
 }

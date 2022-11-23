@@ -20,8 +20,8 @@ namespace TwitchHostRoulette
 
         static void Main(string[] args)
         {
-            var username = ConfigurationManager.AppSettings["username"];
-            var userId = int.Parse(ConfigurationManager.AppSettings["user-id"]);
+            string username = ConfigurationManager.AppSettings["username"];
+            int userId = int.Parse(ConfigurationManager.AppSettings["user-id"]);
             string oauthToken = ConfigurationManager.AppSettings["api-oauth-token"];
             string clientId = ConfigurationManager.AppSettings["api-client-id"];
             string password = ConfigurationManager.AppSettings["oauth"];
@@ -50,7 +50,6 @@ namespace TwitchHostRoulette
                     case RouletteStateEnum.PickingAWinner:
                         _handlePickingAWinner(
                             twitchApiClient: twitchApiClient,
-                            username: username,
                             userId: userId,
                             oauthToken: oauthToken,
                             clientId: clientId,
@@ -114,7 +113,7 @@ namespace TwitchHostRoulette
             }
         }
 
-        private static void _handlePickingAWinner(TwitchApiClient twitchApiClient, string username, int userId, string oauthToken, string clientId, Random random)
+        private static void _handlePickingAWinner(TwitchApiClient twitchApiClient, int userId, string oauthToken, string clientId, Random random)
         {
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.WriteLine("Picking a winner.");
