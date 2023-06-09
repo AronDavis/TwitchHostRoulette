@@ -7,8 +7,9 @@ namespace TwitchIrcBot.CommandManagerPackage
     {
         private Dictionary<string, Command> _commands = new Dictionary<string, Command>();
 
-        public void RunCommand(string key, string message)
+        public void RunCommand(string key, Message message)
         {
+            key = key?.ToLower();
             //if we can't find the key, abort
             if (!_commands.ContainsKey(key))
                 return;
@@ -40,7 +41,7 @@ namespace TwitchIrcBot.CommandManagerPackage
         /// <returns></returns>
         public string GetKey(Command command)
         {
-            return command.Name;
+            return command.Name?.ToLower();
         }
 
         /// <summary>

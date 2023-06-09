@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using TwitchApi;
 using TwitchHostRoulette.Models.Follows;
@@ -19,8 +20,8 @@ namespace FollowCheck
             //4. twitch token
             //5. copy token
             //
-            //ALTERNATIVELY JUST twitch token
-            string oauthToken = "vhv4ihwtf1bljqca65yv8j0qnd645i";
+            //ALTERNATIVELY JUST USE "twitch token"
+            string oauthToken = ConfigurationManager.AppSettings["token"];
             string clientId = "p4y1qamoqkv2o2gm8fnw642yhfdec8";
 
             TwitchApiClient twitchApiClient = new TwitchApiClient();

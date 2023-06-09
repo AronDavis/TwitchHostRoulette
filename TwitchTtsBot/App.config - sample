@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <add key="twitchOAuth" value="VALUE" />
+    <add key="uberduckApiKey" value="VALUE" />
+    <add key="uberduckApiSecret" value="VALUE" />
+  </appSettings>
+</configuration>

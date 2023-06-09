@@ -52,6 +52,7 @@ namespace TwitchIrcBot
 
         public void JoinRoom(string channel)
         {
+            channel = channel.ToLower();
             if (_channels.ContainsKey(channel))
                 throw new Exception($"Already in channel \"{channel}\"");
 
@@ -67,6 +68,7 @@ namespace TwitchIrcBot
 
         public void LeaveRoom(string channel)
         {
+            channel = channel.ToLower();
             if (!_channels.ContainsKey(channel))
                 throw new Exception($"Not in channel \"{channel}\"");
 
@@ -82,14 +84,19 @@ namespace TwitchIrcBot
 
         public void RequestNames()
         {
-            foreach (var channel in _channels.Keys)
+            foreach (string channel in _channels.Keys)
+            {
                 RequestNames(channel);
+            }
         }
 
         public void RequestNames(string channel)
         {
+            channel = channel.ToLower();
             if (!_channels.ContainsKey(channel))
+            {
                 throw new Exception($"Not in channel \"{channel}\"");
+            }
 
             lock (_outputLock)
             {
@@ -109,17 +116,23 @@ namespace TwitchIrcBot
 
         public void SendChatMessage(string channel, string message)
         {
+            channel = channel.ToLower();
             SendIrcMessage(GenerateChatMessage(_username, channel, message));
         }
 
         public string GenerateChatMessage(string username, string channel, string message)
         {
+            channel = channel.ToLower();
             if (!_channels.ContainsKey(channel))
                 throw new Exception($"Not in channel \"{channel}\"");
 
             return $":{username}!{username}@{username}.tmi.twitch.tv PRIVMSG #{channel} :{message}";
         }
 
+        /// <summary>
+        /// For faking incoming messages.
+        /// </summary>
+        /// <param name="message"></param>
         public void ConsoleInput(string message)
         {
             _consoleInput.Enqueue(message);

@@ -83,5 +83,15 @@ namespace TwitchIrcBot
                     break;
             }
         }
+
+        public override string ToString()
+        {
+            if (Username != null && MessageType == MessageTypeEnum.PrivateMessage)
+            {
+                return $"{Username}: {Text}";
+            }
+
+            return Text;
+        }
     }
 }

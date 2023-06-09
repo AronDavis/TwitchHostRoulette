@@ -9,7 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchApi", "TwitchApi\Twit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchIrcBot", "TwitchIrcBot\TwitchIrcBot.csproj", "{7CCFBF57-35DB-4AFF-B986-5EAD239D89F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FollowCheck", "FollowCheck\FollowCheck.csproj", "{ADA35907-0B30-490D-B082-03D400D68B85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FollowCheck", "FollowCheck\FollowCheck.csproj", "{ADA35907-0B30-490D-B082-03D400D68B85}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BanBot", "BanBot\BanBot.csproj", "{5B2DB7F0-6078-493B-9979-A99600186D1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchTtsBot", "TwitchTtsBot\TwitchTtsBot.csproj", "{2BE61022-3D70-4E6A-A06D-DA7F5A4745AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UberduckApi", "UberduckApi\UberduckApi.csproj", "{531539E9-55A2-44D6-9FBD-AF9FD901ED8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +39,18 @@ Global
 		{ADA35907-0B30-490D-B082-03D400D68B85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADA35907-0B30-490D-B082-03D400D68B85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADA35907-0B30-490D-B082-03D400D68B85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B2DB7F0-6078-493B-9979-A99600186D1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B2DB7F0-6078-493B-9979-A99600186D1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B2DB7F0-6078-493B-9979-A99600186D1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B2DB7F0-6078-493B-9979-A99600186D1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BE61022-3D70-4E6A-A06D-DA7F5A4745AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BE61022-3D70-4E6A-A06D-DA7F5A4745AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BE61022-3D70-4E6A-A06D-DA7F5A4745AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BE61022-3D70-4E6A-A06D-DA7F5A4745AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{531539E9-55A2-44D6-9FBD-AF9FD901ED8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{531539E9-55A2-44D6-9FBD-AF9FD901ED8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{531539E9-55A2-44D6-9FBD-AF9FD901ED8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{531539E9-55A2-44D6-9FBD-AF9FD901ED8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
